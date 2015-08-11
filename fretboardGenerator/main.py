@@ -3,6 +3,11 @@ from pyUtils import fileUtils
 from pyUtils import osUtils
 import os
 
+class Fret:
+    def __init__(self, string):
+        self.position = int(string.replace("!", ""))
+        self.root = "!" in string
+
 class Pattern:
     def __init__(self, string):
         spl = string.split(",")
@@ -10,15 +15,19 @@ class Pattern:
         self.frets = []
         for s in spl:
             numbers = s.split(" ")
-            if numbers[0] == "":
+            if numbers == [""]:
                 self.frets.append([])
-            else:
-                self.frets.append([int(n) for n in numbers])
+                continue
+            self.frets.append([Fret(s) for s in numbers])
         self.numStrings = len(self.frets)
-        self.shift = min(map(lambda x : 999 if len(x) == 0 else min(x), self.frets)) 
-        self.numFrets = max(map(lambda x : 0 if len(x) == 0 else max(x), self.frets)) - self.shift + 1
-        self.frets = [[f - self.shift for f in s] for s in self.frets]
-        
+        key = lambda fret : fret.position
+        minFretPos = min([min(string, key=key) for string in self.frets if string != []], key = key).position
+        maxFretPos = max([max(string, key=key) for string in self.frets if string != []], key = key).position
+        self.numFrets = maxFretPos - minFretPos + 1
+        # Shift, such that the lowest fret is always 0
+        for string in self.frets:
+            for fret in string:
+                fret.position = fret.position - minFretPos
 
 def outputConfiguration(name):
     return "set terminal pngcairo\nset output \"../pics/" + name + ".png\"\n\n"
@@ -58,9 +67,10 @@ def drawPattern(pattern):
     s = ""
     for (string, frets) in enumerate(pattern.frets):
         for fret in frets:
-            x = fretWidth * (fret + 0.5)
+            color = "red" if fret.root else "blue"
+            x = fretWidth * (fret.position + 0.5)
             y = stringHeight * (string)
-            s = s + drawCircle(x, y, dotRadius)
+            s = s + drawCircle(x, y, dotRadius, color)
     return s
 
 def endConfiguration():
@@ -73,8 +83,8 @@ def endConfiguration():
 def drawLine(x1, y1, x2, y2):
     return "set arrow from " + str(x1) + "," + str(y1) + " to " + str(x2) + "," + str(y2) + " nohead lc rgb \'black\'\n"
 
-def drawCircle(x, y, radius):
-    return "set object circle at first " + str(x) + "," + str(y) + " size first " + str(radius) + " fillstyle solid fc rgb \"blue\"\n"
+def drawCircle(x, y, radius, color = "blue"):
+    return "set object circle at first " + str(x) + "," + str(y) + " size first " + str(radius) + " fillstyle solid fc rgb \"" + color + "\"\n"
 
 def createPic(name, patternString):
     s = ""
@@ -86,11 +96,13 @@ def createPic(name, patternString):
     s = s + endConfiguration()
     fileUtils.writeFile("plots/plot.gpi", s)
     path = os.path.abspath(".")
-    print("Output:", osUtils.executeStandardCommand(path, "plots/plot.gpi", "gnuplot"))
+    output = osUtils.executeStandardCommand(path, "plots/plot.gpi", "gnuplot")
+    print("Output:", output)
 
 fretWidth = 50
 stringHeight = 50
 dotRadius = 5
 excessSpace = 50
-createPic("ERootMinorScale", "1 3 4,1 3 4,1 3 5,1 3,1 2 4, 1 3 4")
-createPic("ERoot6", "2,,1,3,2")
+createPic("ERootMinorScale", "1! 3 4,1 3 4,1 3! 5,1 3,1 2 4, 1! 3 4")
+createPic("ARootMinorScale", "1 2 4,1! 3 4,1 3 5,1 3!,1 2 4, 1 3 4")
+createPic("ERoot6", "2!,,1,3,2")
