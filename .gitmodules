@@ -1,0 +1,3 @@
+[submodule "pyUtils"]
+	path = pyUtils
+	url = https://github.com/tehforsch/pyUtils
