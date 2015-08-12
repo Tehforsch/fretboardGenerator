@@ -11,9 +11,11 @@ This is just something I needed quickly, but maybe I will extend the functionali
 # Examples
 
 6th Chord voicing with Root on E string:
-Pattern: 2!,,1,3,2
+Pattern: 
+**2!,,1,3,2**
 ![6th Chord voicing with Root on E string](../samplePictures/pics/ERoot6.png?raw=true)
 
 Standard Major Scale starting with the Root on the E string
-Pattern:  1! 3 5, 1 3 5, 2 3! 5, 2 3 5, 3 5, 1! 3 5
+Pattern:  
+**1! 3 5, 1 3 5, 2 3! 5, 2 3 5, 3 5, 1! 3 5**
 ![Standard Major Scale starting with the Root on the E string](../samplePictures/pics/1PosMajorScale.png?raw=true)
