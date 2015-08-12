@@ -3,7 +3,8 @@
 A small script to quickly generate semi-good looking diagrams of fretboard patterns (scales, chords) using gnuplot.
 
 Takes a pattern string and converts it into a picture. A pattern string looks like
-(All frets on first string separated by a space), (All frets on second string separated by a space), ...
+
+"All frets on first string separated by a space, All frets on second string separated by a space, ..."
 Optionally, one can signify the root note by placing a "!" behind the fret.
 
 This is just something I needed quickly, but maybe I will extend the functionality to "understand" music theory so that Arpeggios and Scales can be generated automatically.
