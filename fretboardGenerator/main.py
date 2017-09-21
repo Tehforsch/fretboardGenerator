@@ -1,7 +1,5 @@
-# from fretboardGenerator import modulename
-from pyUtils import fileUtils
-from pyUtils import osUtils
 import os
+import subprocess
 
 class Fret:
     def __init__(self, string):
@@ -94,15 +92,41 @@ def createPic(name, patternString):
     s = s + drawFretboard(pattern.numStrings, pattern.numFrets)
     s = s + drawPattern(pattern)
     s = s + endConfiguration()
-    fileUtils.writeFile("plots/plot.gpi", s)
+    writeFile("plots/plot.gpi", s)
     path = os.path.abspath(".")
-    output = osUtils.executeStandardCommand(path, "plots/plot.gpi", "gnuplot")
-    print("Output:", output)
+    output = runCommand("gnuplot plot.gpi", path="plots")
+
+def writeFile(filename, content):
+    print(filename)
+    with open(filename, "w") as f:
+        f.write(content)
+
+def runCommand(command, path = None):
+    """Runs the system command and returns output and errors"""
+    if path is not None:
+        mainPath = os.getcwd()
+        os.chdir(path)
+    p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    # I think this properly waits for the process to finish and therefore
+    # gets the correct return code which can be useful to check if something failed
+    stdout, stderr = p.communicate() 
+    if path is not None:
+        os.chdir(mainPath)
+    return p.returncode, stdout, stderr
+
+def ensureExists(directory):
+    if not os.path.isdir(directory):
+        os.mkdir(directory)
+
+ensureExists("plots")
+ensureExists("pics")
 
 fretWidth = 50
 stringHeight = 50
 dotRadius = 5
 excessSpace = 50
-createPic("ERootMinorScale", "1! 3 4,1 3 4,1 3! 5,1 3,1 2 4, 1! 3 4")
-createPic("ARootMinorScale", "1 2 4,1! 3 4,1 3 5,1 3!,1 2 4, 1 3 4")
-createPic("ERoot6", "2!,,1,3,2")
+# createPic("ERootMinorScale", "1! 3 4,1 3 4,1 3! 5,1 3,1 2 4, 1! 3 4")
+# createPic("ARootMinorScale", "1 2 4,1! 3 4,1 3 5,1 3!,1 2 4, 1 3 4")
+# createPic("ERoot6", "2!,,1,3,2")
+createPic("7b9", ",2!,1,2,1,")
+createPic("minorb5", "2!,,2,2,1,")
